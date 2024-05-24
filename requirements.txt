@@ -1,0 +1,4 @@
+gradio
+psycopg2
+langchain_community
+python-dotenv
