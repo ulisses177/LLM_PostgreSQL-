@@ -48,7 +48,7 @@ def extract_sql_query(response):
         raise ValueError(f"The generated response does not contain a valid SQL query.\n\nFull response:\n{response}")
 
 def generate_sql_query(message, schema_info):
-    prompt = (f"Generate a valid SQL query to retrieve data based on the following request, focus on the sql command, no need to explain it further: {message}\n"
+    prompt = (f"Generate a valid SQL query to retrieve data based on the following request: {message}\n"
               f"Database schema information:\n{schema_info}\n"
               "Example: SELECT * FROM table WHERE condition;")
     response = llm.invoke(prompt).strip()
@@ -56,6 +56,19 @@ def generate_sql_query(message, schema_info):
     print(f"Generated Response: {response}")
     sql_query = extract_sql_query(response)
     return sql_query, response
+
+def correct_sql_error(schema_info, original_query, error_message):
+    prompt = (f"The following SQL query resulted in an error:\n\n"
+              f"{original_query}\n\n"
+              f"Error message:\n{error_message}\n\n"
+              f"Based on the following database schema, please correct the SQL query:\n{schema_info}\n"
+              "Example: SELECT * FROM table WHERE condition;")
+    response = llm.invoke(prompt).strip()
+    # Log the generated response for debugging
+    print(f"Correction Response: {response}")
+    sql_query = extract_sql_query(response)
+    return sql_query
+
 
 def reset_connection():
     global conn
